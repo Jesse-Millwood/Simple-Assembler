@@ -1,0 +1,211 @@
+#! /usr/bin/python
+
+# Author: Jesse Millwood
+
+import re
+import sys
+import getopt
+'''
+Takes the input from a file and converts it to the machine code
+for a simple micro-controller implementation in Verilog on a Xilinx FPGA
+Python Version: 2.7
+'''
+# Instruction   ->  Encoding
+#----------------|-------------------
+# Load M,R 		-> 000000pr, mmmmmmmm
+# STOR R,M 		-> 000001pr, mmmmmmmm
+# ADD R 		-> 1000000r 
+# SUB R 		-> 1001000r
+# LSL R 		-> 1010000r 
+# LSR R 		-> 1011000r 
+# XOR R 		-> 1100000r
+# COM R 		-> 1101000r
+# NEG R 		-> 1110000r 
+# CLR R 		-> 1111000r
+# OUT R,P 		-> 000010ir
+# IN P,R 		-> 000011ir
+
+
+
+def readfile(in_path, out_path):
+	'''
+	Reads every line in the file and saves it to a list
+	'''
+	with open(in_path, 'rb') as filehandle:
+		lines = [line.rstrip() for line in filehandle]
+	parse(lines, out_path)
+
+def parse(lines, out_path):
+	'''
+	If the instruction is in the 0 index of the 
+	command parse it and write the appropriate encoding 
+	values a a file called Encoding.dat
+	'''
+	with open(out_path, 'w') as f:
+		for line in lines:
+			line = line.upper()
+			tokens = re.split(',| ',line)
+
+			if 'LOAD' in tokens:
+				# convert memory parameter to an integer
+				tokens[1] = int(tokens[1])
+				# Set bit representing the register
+				if 'A' in tokens[2]:
+					r = 0
+				elif 'B' in tokens[2]:
+					r = 1
+				# Set bit representing the page and 
+				# rewrite memory address with respect to the page
+				if tokens[1] <= 255:
+					p = 0
+				else:
+			 		p = 1
+			 		tokens[1] = tokens[1]-255
+			 	# Put together instructions
+			 	instruction1 = '000000'+str(p)+str(r)+'\n'
+			 	instruction2 = bin(tokens[1])[2:].zfill(8)+'\n'
+			 	# Write to file
+				f.write(instruction1)
+				f.write(instruction2)
+			elif 'STOR' in tokens:
+				# convert memory parameter to an integer
+				tokens[2] = int(tokens[2])
+				# Set bit representing the register
+				if 'A' in tokens[1]:
+					r = 0
+				elif 'B' in tokens[1]:
+					r = 1
+				# Set bit representing the page
+				if tokens[2] <= 255:
+					p = 0
+				else:
+			 		p = 1
+			 		tokens[2] = tokens[2] - 255
+			 	# Put together instructions
+			 	instruction1 = '000000'+str(p)+str(r)+'\n'
+			 	instruction2 = bin(tokens[2])[2:].zfill(8)+'\n'
+			 	# Write to file
+				f.write(instruction1)
+				f.write(instruction2)
+			elif 'ADD' in tokens:
+				# Set bit representing the register
+				if 'A' in tokens[1]:
+					r = 0
+				elif 'B' in tokens[1]:
+					r = 1
+				instruction1 = '1000000'+str(r)+'\n'
+				f.write(instruction1)
+			elif 'SUB' in tokens:
+				# Set bit representing the register
+				if 'A' in tokens[1]:
+					r = 0
+				elif 'B' in tokens[1]:
+					r = 1
+				instruction1 = '1001000'+str(r)+'\n'
+				f.write(instruction1)
+			elif 'LSL' in tokens:
+				# Set bit representing the register
+				if 'A' in tokens[1]:
+					r = 0
+				elif 'B' in tokens[1]:
+					r = 1
+				instruction1 = '1010000'+str(r)+'\n'
+				f.write(instruction1)
+				f.write()
+			elif 'LSR' in tokens:
+				# Set bit representing the register
+				if 'A' in tokens[1]:
+					r = 0
+				elif 'B' in tokens[1]:
+					r = 1
+				instruction1 = '1011000'+str(r)+'\n'
+				f.write(instruction1)
+				f.write()
+			elif 'XOR' in tokens:
+				# Set bit representing the register
+				if 'A' in tokens[1]:
+					r = 0
+				elif 'B' in tokens[1]:
+					r = 1
+				instruction1 = '1100000'+str(r)+'\n'
+				f.write(instruction1)
+			elif 'COM' in tokens:
+				# Set bit representing the register
+				if 'A' in tokens[1]:
+					r = 0
+				elif 'B' in tokens[1]:
+					r = 1
+				instruction1 = '1101000'+str(r)+'\n'
+				f.write(instruction1)
+				f.write()
+			elif 'NEG' in tokens:
+				# Set bit representing the register
+				if 'A' in tokens[1]:
+					r = 0
+				elif 'B' in tokens[1]:
+					r = 1
+				instruction1 = '1110000'+str(r)+'\n'
+				f.write(instruction1)
+				f.write()
+			elif 'CLR' in tokens:
+				# Set bit representing the register
+				if 'A' in tokens[1]:
+					r = 0
+				elif 'B' in tokens[1]:
+					r = 1
+				instruction1 = '1111000'+str(r)+'\n'
+				f.write(instruction1)
+				f.write()
+			elif 'OUT' in tokens:
+				# Set bit representing the register
+				if 'A' in tokens[1]:
+					r = 0
+				elif 'B' in tokens[1]:
+					r = 1
+				if tokens[2].isdigit and tokens[2] == 0:
+					i = 0
+				elif tokens[2].isdigit and tokens[2] == 1:
+					i = 1
+				instruction1 = '000010'+str(i) + str(r)+'\n'
+				f.write(instruction1)
+			elif 'IN' in tokens:
+				# Set bit representing the register
+				if 'A' in tokens[2]:
+					r = 0
+				elif 'B' in tokens[2]:
+					r = 1
+				if tokens[1].isdigit and tokens[1] == 0:
+					i = 0
+				elif tokens[1].isdigit and tokens[1] == 1:
+					i = 1
+				instruction1 = '000011'+str(i) + str(r)+'\n'
+				f.write(instruction1)
+
+def main(argv):
+	# Default file names options
+	inFILE = 'Instructions.dat'
+	outFILE= 'Encoding.dat'
+	try:
+		opts, args = getopt.getopt(argv, 'i:o:h',['inFILE','outFILE','help'])
+
+	except getopt.GetoptError:
+		print 'Nothing you entered was correct... try again bud'
+		sys.exit(2)
+
+	for opt, arg in opts:
+		if opt in ('-i', '--inFILE'):
+			inFILE = arg
+		elif opt in ('-o','--outFILE'):
+			outFILE = arg
+		elif opt in ('-h','--help'):
+			print 'This is the help... i guess.. it sucks.. i knowz'
+
+	readfile(inFILE, outFILE)
+
+
+
+
+
+
+if __name__ == '__main__':
+	main(sys.argv[1:])
