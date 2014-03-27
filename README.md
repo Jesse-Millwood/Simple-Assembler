@@ -6,7 +6,7 @@ The SimpleAssembler python script can be run from the command line with the swit
 The following are the instructions implemented so far
 
 |Instruction | Encoding          |
-|------------|------------------:|
+|------------|:------------------:|
 |Load M,R 	 |000000pr, mmmmmmmm |
 |STOR R,M 	 |000001pr, mmmmmmmm |
 |ADD R 		 |1000000r           |  
