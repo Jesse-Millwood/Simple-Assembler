@@ -24,24 +24,35 @@ Python Version: 2.7
 # CLR R 		-> 1111000r
 # OUT R,P 		-> 000010ir
 # IN P,R 		-> 000011ir
+# BCDO R        -> 0100000r
 
 
 
-def readfile(in_path, out_path):
+def readfile(in_path, out_path, type):
 	'''
 	Reads every line in the file and saves it to a list
 	'''
 	with open(in_path, 'rb') as filehandle:
 		lines = [line.rstrip() for line in filehandle]
-	parse(lines, out_path)
+	filetype = out_path[out_path.find('.'):]
+	filename = out_path.replace(filetype,'.coe')
+	parse(lines, filename, type)
 
-def parse(lines, out_path):
+def parse(lines, out_path, type):
 	'''
 	If the instruction is in the 0 index of the 
 	command parse it and write the appropriate encoding 
 	values a a file called Encoding.dat
 	'''
 	with open(out_path, 'w') as f:
+		if 'coe' in type:
+			f.write('; Coefficient file for initializing a 512x8 RAM\n') 
+			f.write('; to demonstrate CPU functionality.\n')
+			f.write(';\n')
+			f.write(';\n')
+			f.write('memory_initialization_radix = 2;\n')
+			f.write('memory_initialization_vector =\n')
+
 		for line in lines:
 			line = line.upper()
 			tokens = re.split(',| ',line)
@@ -180,13 +191,27 @@ def parse(lines, out_path):
 					i = 1
 				instruction1 = '000011'+str(i) + str(r)+'\n'
 				f.write(instruction1)
+			elif 'BCDO' in tokens:
+				# Set bit representing the register
+				if 'A' in tokens[1]:
+					r = 0
+				elif 'B' in tokens[1]:
+					r = 1
+				instruction1 = '0100000' + str(r)+'\n'
+				f.write(instruction1)
+		f.write(';')
+		if 'coe' in type:
+			f.write('\n')
+			f.write(';Instructions:\n')
+			for (number,line) in enumerate(lines):
+				f.write(';'+str(number)+': '+line+'\n')
 
 def main(argv):
 	# Default file names options
 	inFILE = 'Instructions.dat'
 	outFILE= 'Encoding.dat'
 	try:
-		opts, args = getopt.getopt(argv, 'i:o:h',['inFILE','outFILE','help'])
+		opts, args = getopt.getopt(argv, 'i:o:ht:',['inFILE','outFILE','help','type'])
 
 	except getopt.GetoptError:
 		print 'Nothing you entered was correct... try again bud'
@@ -197,10 +222,18 @@ def main(argv):
 			inFILE = arg
 		elif opt in ('-o','--outFILE'):
 			outFILE = arg
+		elif opt in ('-t', '--type'):
+			type = arg
 		elif opt in ('-h','--help'):
-			print 'This is the help... i guess.. it sucks.. i knowz'
+			print 'Simple Assembler Help:'
+			print '-t or --type defines the type of output file'
+			print 'choices are .coe or .dat'
+			print ''
+			print '-o or --outFILE defines the name of the output file'
+			print '-i or --inFILE defines the name of the input file'
 
-	readfile(inFILE, outFILE)
+	readfile(inFILE, outFILE, type)
+	print 'Successful Conversion'
 
 
 

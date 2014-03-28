@@ -1,7 +1,9 @@
 Simple Assembler
 =================
 
-The SimpleAssembler python script can be run from the command line with the switches '-i' and '-o' for input file and output file respectively. The input file should have the instructions one after another as they are in the sample Instructions.dat file. This is the file it looks for if no input file is specified. The output file is named Encoding.dat. 
+The SimpleAssembler python script can be run from the command line with the switches '-i'(--inFILE) and '-o'(--outFILE) for input file and output file respectively. The input file should have the instructions one after another as they are in the sample Instructions.dat file. This is the file it looks for if no input file is specified. The output file is named Encoding.dat. 
+
+The switch -t or --type is used to specify the type of the output file. If '.coe' is used the output file will have a header and radix information common in Xilinx Coefficient files. It will also have comments at the end that correspond to the contents of the input file.
 
 The following are the instructions implemented so far
 
@@ -18,4 +20,5 @@ The following are the instructions implemented so far
 |NEG R 		 |1110000r           |  
 |CLR R 		 |1111000r           | 
 |OUT R,P 	 |000010ir           | 
-|IN P,R 	 |000011ir           |  
+|IN P,R 	 |000011ir           | 
+|BCDO R      |0100000r           | 

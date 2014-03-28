@@ -1,0 +1,19 @@
+; Coefficient file for initializing a 512x8 RAM
+; to demonstrate CPU functionality.
+;
+;
+memory_initialization_radix = 2;
+memory_initialization_vector =
+00000010
+11110101
+00000011
+11110110
+10000000
+00000000
+01100100
+;
+;Instructions:
+;0: LOAD 500,A
+;1: LOAD 501,B
+;2: ADD A
+;3: STOR A,100
