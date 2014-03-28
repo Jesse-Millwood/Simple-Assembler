@@ -8,7 +8,7 @@ The switch -t or --type is used to specify the type of the output file. If '.coe
 The following are the instructions implemented so far
 
 |Instruction | Encoding          |
-|------------|------------------:|
+|------------|:-----------------:|
 |Load M,R 	 |000000pr, mmmmmmmm |
 |STOR R,M 	 |000001pr, mmmmmmmm |
 |ADD R 		 |1000000r           |  
@@ -22,3 +22,4 @@ The following are the instructions implemented so far
 |OUT R,P 	 |000010ir           | 
 |IN P,R 	 |000011ir           | 
 |BCDO R      |0100000r           | 
+
