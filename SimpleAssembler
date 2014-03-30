@@ -34,15 +34,16 @@ def readfile(in_path, out_path, type):
 	'''
 	with open(in_path, 'rb') as filehandle:
 		lines = [line.rstrip() for line in filehandle]
-	filetype = out_path[out_path.find('.'):]
-	filename = out_path.replace(filetype,'.coe')
+	if 'coe' in type:
+		filetype = out_path[out_path.find('.'):]
+		filename = out_path.replace(filetype,'.coe')
 	parse(lines, filename, type)
 
 def parse(lines, out_path, type):
 	'''
 	If the instruction is in the 0 index of the 
-	command parse it and write the appropriate encoding 
-	values a a file called Encoding.dat
+	command, parse it and write the appropriate encoding 
+	values to a file either specified by the user or the default 
 	'''
 	with open(out_path, 'w') as f:
 		if 'coe' in type:
@@ -231,6 +232,8 @@ def main(argv):
 			print ''
 			print '-o or --outFILE defines the name of the output file'
 			print '-i or --inFILE defines the name of the input file'
+
+	
 
 	readfile(inFILE, outFILE, type)
 	print 'Successful Conversion'
