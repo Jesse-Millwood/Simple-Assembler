@@ -27,3 +27,8 @@ The following are the instructions implemented so far
 |IN P,R 	 |000011ir           | 
 |BCDO R      |0100000r           | 
 
+
+In the input file, memory locations can be initialized by typing the memory address and desired contents of the that memory address separated by a colon.  
+The following example would initialize memory location 230 to the value 10:  
+`230:10`
+

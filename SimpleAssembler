@@ -45,6 +45,13 @@ def parse(lines, out_path, type):
 	command, parse it and write the appropriate encoding 
 	values to a file either specified by the user or the default 
 	'''
+	# define empty dictionary that will hold 
+	# 'desired memory location' : 'desired contents value'
+	memory_vals = {}
+	# variable to keep track of the line number that the 
+	# instructions take up
+	lineno = 0
+
 	with open(out_path, 'w') as f:
 		if 'coe' in type:
 			f.write('; Coefficient file for initializing a 512x8 RAM\n') 
@@ -56,9 +63,17 @@ def parse(lines, out_path, type):
 
 		for line in lines:
 			line = line.upper()
-			tokens = re.split(',| ',line)
+			tokens = re.split(',|:|;| ',line)
+			if '' in tokens: tokens.remove('')
 
-			if 'LOAD' in tokens:
+
+			if tokens[0].isdigit():
+				# Store the initialized memory 
+				# value  and contents to be set after the op
+				# codes are finished
+				memory_vals[tokens[0]] = tokens[1]
+
+			elif 'LOAD' in tokens:
 				# convert memory parameter to an integer
 				tokens[1] = int(tokens[1])
 				# Set bit representing the register
@@ -79,6 +94,7 @@ def parse(lines, out_path, type):
 			 	# Write to file
 				f.write(instruction1)
 				f.write(instruction2)
+				lineno += 2
 			elif 'STOR' in tokens:
 				# convert memory parameter to an integer
 				tokens[2] = int(tokens[2])
@@ -99,6 +115,7 @@ def parse(lines, out_path, type):
 			 	# Write to file
 				f.write(instruction1)
 				f.write(instruction2)
+				lineno+=2
 			elif 'ADD' in tokens:
 				# Set bit representing the register
 				if 'A' in tokens[1]:
@@ -107,6 +124,7 @@ def parse(lines, out_path, type):
 					r = 1
 				instruction1 = '1000000'+str(r)+'\n'
 				f.write(instruction1)
+				lineno+=1
 			elif 'SUB' in tokens:
 				# Set bit representing the register
 				if 'A' in tokens[1]:
@@ -115,6 +133,7 @@ def parse(lines, out_path, type):
 					r = 1
 				instruction1 = '1001000'+str(r)+'\n'
 				f.write(instruction1)
+				lineno+=1
 			elif 'LSL' in tokens:
 				# Set bit representing the register
 				if 'A' in tokens[1]:
@@ -124,6 +143,7 @@ def parse(lines, out_path, type):
 				instruction1 = '1010000'+str(r)+'\n'
 				f.write(instruction1)
 				f.write()
+				lineno+=1
 			elif 'LSR' in tokens:
 				# Set bit representing the register
 				if 'A' in tokens[1]:
@@ -133,6 +153,7 @@ def parse(lines, out_path, type):
 				instruction1 = '1011000'+str(r)+'\n'
 				f.write(instruction1)
 				f.write()
+				lineno+=1
 			elif 'XOR' in tokens:
 				# Set bit representing the register
 				if 'A' in tokens[1]:
@@ -141,6 +162,7 @@ def parse(lines, out_path, type):
 					r = 1
 				instruction1 = '1100000'+str(r)+'\n'
 				f.write(instruction1)
+				lineno+=1
 			elif 'COM' in tokens:
 				# Set bit representing the register
 				if 'A' in tokens[1]:
@@ -150,6 +172,7 @@ def parse(lines, out_path, type):
 				instruction1 = '1101000'+str(r)+'\n'
 				f.write(instruction1)
 				f.write()
+				lineno+=1
 			elif 'NEG' in tokens:
 				# Set bit representing the register
 				if 'A' in tokens[1]:
@@ -159,6 +182,7 @@ def parse(lines, out_path, type):
 				instruction1 = '1110000'+str(r)+'\n'
 				f.write(instruction1)
 				f.write()
+				lineno+=1
 			elif 'CLR' in tokens:
 				# Set bit representing the register
 				if 'A' in tokens[1]:
@@ -168,6 +192,7 @@ def parse(lines, out_path, type):
 				instruction1 = '1111000'+str(r)+'\n'
 				f.write(instruction1)
 				f.write()
+				lineno+=1
 			elif 'OUT' in tokens:
 				# Set bit representing the register
 				if 'A' in tokens[1]:
@@ -180,6 +205,7 @@ def parse(lines, out_path, type):
 					i = 1
 				instruction1 = '000010'+str(i) + str(r)+'\n'
 				f.write(instruction1)
+				lineno+=1
 			elif 'IN' in tokens:
 				# Set bit representing the register
 				if 'A' in tokens[2]:
@@ -192,6 +218,7 @@ def parse(lines, out_path, type):
 					i = 1
 				instruction1 = '000011'+str(i) + str(r)+'\n'
 				f.write(instruction1)
+				lineno+=1
 			elif 'BCDO' in tokens:
 				# Set bit representing the register
 				if 'A' in tokens[1]:
@@ -200,17 +227,29 @@ def parse(lines, out_path, type):
 					r = 1
 				instruction1 = '0100000' + str(r)+'\n'
 				f.write(instruction1)
-		f.write(';')
+				lineno+=1
 		if 'coe' in type:
 			f.write('\n')
 			f.write(';Instructions:\n')
 			for (number,line) in enumerate(lines):
 				f.write(';'+str(number)+': '+line+'\n')
+			f.write(';--- Memory Starts at line {}\n'.format(lineno))
+		for no in range(lineno,512):
+			# Start writing the user defined values to the proper
+			# memory locations
+			if memory_vals.has_key(str(no)):
+				binary_rep = bin(int(memory_vals[str(no)]))[2:].zfill(8)
+				f.write(binary_rep+'\n')
+			else:
+				f.write('00000000\n')
+		f.write(';')
+
 
 def main(argv):
 	# Default file names options
 	inFILE = 'Instructions.dat'
 	outFILE= 'Encoding.dat'
+	type = 'coe'
 	try:
 		opts, args = getopt.getopt(argv, 'i:o:ht:',['inFILE','outFILE','help','type'])
 
