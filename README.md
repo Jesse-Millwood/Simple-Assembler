@@ -26,6 +26,7 @@ The following are the instructions implemented so far
 |OUT R,P 	 |000010ir           | 
 |IN P,R 	 |000011ir           | 
 |BCDO R      |0100000r           | 
+|DEB i,R     |001000ir 			 |
 
 
 In the input file, memory locations can be initialized by typing the memory address and desired contents of the that memory address separated by a colon.  

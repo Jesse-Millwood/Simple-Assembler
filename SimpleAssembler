@@ -25,6 +25,7 @@ Python Version: 2.7
 # OUT R,P 		-> 000010ir
 # IN P,R 		-> 000011ir
 # BCDO R        -> 0100000r
+# DEB i,R       -> 001000ir
 
 
 
@@ -226,6 +227,17 @@ def parse(lines, out_path, type):
 				elif 'B' in tokens[1]:
 					r = 1
 				instruction1 = '0100000' + str(r)+'\n'
+				f.write(instruction1)
+				lineno+=1
+			elif 'DEB' in tokens:
+				# Set bit representing the register
+				if tokens[1].isdigit():
+					i = str(tokens[1])
+				if 'A' in tokens[2]:
+					r = 0
+				elif 'B' in tokens[2]:
+					r = 1
+				instruction1 = '001000' + i + str(r)
 				f.write(instruction1)
 				lineno+=1
 		if 'coe' in type:
