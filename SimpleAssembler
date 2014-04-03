@@ -38,6 +38,9 @@ def readfile(in_path, out_path, type):
 	if 'coe' in type:
 		filetype = out_path[out_path.find('.'):]
 		filename = out_path.replace(filetype,'.coe')
+	elif 'dat' in type:
+		filetype = out_path[out_path.find('.')]
+		filename = out_path.replace(filetype,'.dat')
 	parse(lines, filename, type)
 
 def parse(lines, out_path, type):
@@ -260,7 +263,7 @@ def parse(lines, out_path, type):
 def main(argv):
 	# Default file names options
 	inFILE = 'Instructions.dat'
-	outFILE= 'Encoding.dat'
+	outFILE= 'Encoding.coe'
 	type = 'coe'
 	try:
 		opts, args = getopt.getopt(argv, 'i:o:ht:',['inFILE','outFILE','help','type'])
