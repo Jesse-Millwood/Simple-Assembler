@@ -241,7 +241,7 @@ def parse(lines, out_path, type):
 					r = 0
 				elif 'B' in tokens[2]:
 					r = 1
-				instruction1 = '001000' + i + str(r)
+				instruction1 = '001000' + i + str(r)+'\n'
 				f.write(instruction1)
 				lineno+=1
 		if 'coe' in type:
