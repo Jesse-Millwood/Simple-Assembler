@@ -36,11 +36,17 @@ def readfile(in_path, out_path, type):
 	with open(in_path, 'rb') as filehandle:
 		lines = [line.rstrip() for line in filehandle]
 	if 'coe' in type:
-		filetype = out_path[out_path.find('.'):]
-		filename = out_path.replace(filetype,'.coe')
+		if '.' in out_path:
+			filetype = out_path[out_path.find('.'):]
+			filename = out_path.replace(filetype,'.coe')
+		else:
+			filename = out_path + '.coe'
 	elif 'dat' in type:
-		filetype = out_path[out_path.find('.')]
-		filename = out_path.replace(filetype,'.dat')
+		if '.' in out_path:
+			filetype = out_path[out_path.find('.')]
+			filename = out_path.replace(filetype,'.dat')
+		else:
+			filename = out_path + '.dat'
 	parse(lines, filename, type)
 
 def parse(lines, out_path, type):
@@ -239,7 +245,6 @@ def parse(lines, out_path, type):
 				f.write(instruction1)
 				lineno+=1
 		if 'coe' in type:
-			f.write('\n')
 			f.write(';Instructions:\n')
 			for (number,line) in enumerate(lines):
 				f.write(';'+str(number)+': '+line+'\n')
