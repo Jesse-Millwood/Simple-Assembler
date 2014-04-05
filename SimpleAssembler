@@ -146,7 +146,6 @@ def parse(lines, out_path, type):
 					r = 1
 				instruction1 = '1010000'+str(r)+'\n'
 				f.write(instruction1)
-				f.write()
 				lineno+=1
 			elif 'LSR' in tokens:
 				# Set bit representing the register
@@ -156,7 +155,6 @@ def parse(lines, out_path, type):
 					r = 1
 				instruction1 = '1011000'+str(r)+'\n'
 				f.write(instruction1)
-				f.write()
 				lineno+=1
 			elif 'XOR' in tokens:
 				# Set bit representing the register
@@ -175,7 +173,6 @@ def parse(lines, out_path, type):
 					r = 1
 				instruction1 = '1101000'+str(r)+'\n'
 				f.write(instruction1)
-				f.write()
 				lineno+=1
 			elif 'NEG' in tokens:
 				# Set bit representing the register
@@ -185,7 +182,6 @@ def parse(lines, out_path, type):
 					r = 1
 				instruction1 = '1110000'+str(r)+'\n'
 				f.write(instruction1)
-				f.write()
 				lineno+=1
 			elif 'CLR' in tokens:
 				# Set bit representing the register
@@ -195,7 +191,6 @@ def parse(lines, out_path, type):
 					r = 1
 				instruction1 = '1111000'+str(r)+'\n'
 				f.write(instruction1)
-				f.write()
 				lineno+=1
 			elif 'OUT' in tokens:
 				# Set bit representing the register
