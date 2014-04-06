@@ -34,9 +34,9 @@ The following example would initialize memory location 230 to the value 10:
 `230:10`
 
 Blocks of code can also be specified to start at certain memory addresses with the 'BEGIN' directive. The following would start the instructions at memory location: 100 and end at 105.  
-`BEGIN:100`  
-`LOAD 200,A`  
-`LOAD 201,B`
-`BCDO A`  
-`BCDO B`
+`BEGIN:100    
+LOAD 200,A  
+LOAD 201,B  
+BCDO A  
+BCDO B`
 
