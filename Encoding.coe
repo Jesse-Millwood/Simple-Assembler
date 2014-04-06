@@ -1,30 +1,34 @@
 ; Coefficient file for initializing a 512x8 RAM
-; to demonstrate CPU functionality.
+; Filename: Encoding.coe
 ;
 ;
+;Instructions:
+;; Initialize Memory Location Values
+;20:100
+;21:100
+;
+;BEGIN:100
+;; This starts at Memory Location 100
+;CLR A
+;CLR B
+;BCDO A
+;BCDO B
+;LOAD 20,A
+;LOAD 21,B
+;
+;BEGIN:150
+;; This starts at Memory Location 150
+;BCDO A
+;BCDO B
+;CLR A
+;DEB 0,A
+;BCDO A
 memory_initialization_radix = 2;
 memory_initialization_vector =
-00000010
-11110101
-00000011
-11110110
-10000000
 00000000
-01100100
-
-;Instructions:
-;0: 10:100
-;1: 11:100
-;2: LOAD 500,A
-;3: LOAD 501,B
-;4: ADD A
-;5: STOR A,100
-;--- Memory Starts at line 7
 00000000
 00000000
 00000000
-01100100
-01100100
 00000000
 00000000
 00000000
@@ -41,6 +45,8 @@ memory_initialization_vector =
 00000000
 00000000
 00000000
+00010100
+00010101
 00000000
 00000000
 00000000
@@ -119,7 +125,14 @@ memory_initialization_vector =
 00000000
 00000000
 00000000
+11110000
+11110001
+01000000
+01000001
 00000000
+00010100
+00000001
+00010101
 00000000
 00000000
 00000000
@@ -162,12 +175,11 @@ memory_initialization_vector =
 00000000
 00000000
 00000000
-00000000
-00000000
-00000000
-00000000
-00000000
-00000000
+01000000
+01000001
+11110000
+00100000
+01000000
 00000000
 00000000
 00000000

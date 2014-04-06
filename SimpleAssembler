@@ -26,265 +26,364 @@ Python Version: 2.7
 # IN P,R 		-> 000011ir
 # BCDO R        -> 0100000r
 # DEB i,R       -> 001000ir
-# BZ M          -> 0011000p, mmmmmmmm
+# BZ M          -> 001100p0, mmmmmmmm
 
-
-
-def readfile(in_path, out_path, type):
+def createCOEfile(out_filename, memory_vals, lines):
 	'''
-	Reads every line in the file and saves it to a list
+	Creates a coe file containing comments and memory values
 	'''
-	with open(in_path, 'rb') as filehandle:
-		lines = [line.rstrip() for line in filehandle]
-	if 'coe' in type:
-		if '.' in out_path:
-			filetype = out_path[out_path.find('.'):]
-			filename = out_path.replace(filetype,'.coe')
-		else:
-			filename = out_path + '.coe'
-	elif 'dat' in type:
-		if '.' in out_path:
-			filetype = out_path[out_path.find('.')]
-			filename = out_path.replace(filetype,'.dat')
-		else:
-			filename = out_path + '.dat'
-	parse(lines, filename, type)
-
-def parse(lines, out_path, type):
-	'''
-	If the instruction is in the 0 index of the 
-	command, parse it and write the appropriate encoding 
-	values to a file either specified by the user or the default 
-	'''
-	# define empty dictionary that will hold 
-	# 'desired memory location' : 'desired contents value'
-	memory_vals = {}
-	# variable to keep track of the line number that the 
-	# instructions take up
-	lineno = 0
-
-	with open(out_path, 'w') as f:
-		if 'coe' in type:
-			f.write('; Coefficient file for initializing a 512x8 RAM\n') 
-			f.write('; to demonstrate CPU functionality.\n')
-			f.write(';\n')
-			f.write(';\n')
-			f.write('memory_initialization_radix = 2;\n')
-			f.write('memory_initialization_vector =\n')
-
-		for line in lines:
-			line = line.upper()
-			tokens = re.split(',|:|;| ',line)
-			if '' in tokens: tokens.remove('')
-
-
-			if tokens[0].isdigit():
-				# Store the initialized memory 
-				# value  and contents to be set after the op
-				# codes are finished
-				memory_vals[tokens[0]] = tokens[1]
-
-			elif 'LOAD' in tokens:
-				# convert memory parameter to an integer
-				tokens[1] = int(tokens[1])
-				# Set bit representing the register
-				if 'A' in tokens[2]:
-					r = 0
-				elif 'B' in tokens[2]:
-					r = 1
-				# Set bit representing the page and 
-				if tokens[1] <= 255:
-					p = 0
-				else:
-			 		p = 1
-			 	# Put together instructions
-			 	instruction1 = '000000'+str(p)+str(r)+'\n'
-			 	# The least significant bits of the desired address are stored
-			 	# in the second instruction. The cpu appends the page bit
-			 	# to the address when it is put on the address bus
-			 	instruction2 = bin(tokens[1])[2:].zfill(8)[-8:]+'\n'
-			 	# Write to file
-				f.write(instruction1)
-				f.write(instruction2)
-				lineno += 2
-			elif 'STOR' in tokens:
-				# convert memory parameter to an integer
-				tokens[2] = int(tokens[2])
-				# Set bit representing the register
-				if 'A' in tokens[1]:
-					r = 0
-				elif 'B' in tokens[1]:
-					r = 1
-				# Set bit representing the page
-				if tokens[2] <= 255:
-					p = 0
-				else:
-			 		p = 1
-			 	# Put together instructions
-			 	instruction1 = '000000'+str(p)+str(r)+'\n'
-			 	instruction2 = bin(tokens[2])[2:].zfill(8)[-8]+'\n'
-			 	# Write to file
-				f.write(instruction1)
-				f.write(instruction2)
-				lineno+=2
-			elif 'ADD' in tokens:
-				# Set bit representing the register
-				if 'A' in tokens[1]:
-					r = 0
-				elif 'B' in tokens[1]:
-					r = 1
-				instruction1 = '1000000'+str(r)+'\n'
-				f.write(instruction1)
-				lineno+=1
-			elif 'SUB' in tokens:
-				# Set bit representing the register
-				if 'A' in tokens[1]:
-					r = 0
-				elif 'B' in tokens[1]:
-					r = 1
-				instruction1 = '1001000'+str(r)+'\n'
-				f.write(instruction1)
-				lineno+=1
-			elif 'LSL' in tokens:
-				# Set bit representing the register
-				if 'A' in tokens[1]:
-					r = 0
-				elif 'B' in tokens[1]:
-					r = 1
-				instruction1 = '1010000'+str(r)+'\n'
-				f.write(instruction1)
-				lineno+=1
-			elif 'LSR' in tokens:
-				# Set bit representing the register
-				if 'A' in tokens[1]:
-					r = 0
-				elif 'B' in tokens[1]:
-					r = 1
-				instruction1 = '1011000'+str(r)+'\n'
-				f.write(instruction1)
-				lineno+=1
-			elif 'XOR' in tokens:
-				# Set bit representing the register
-				if 'A' in tokens[1]:
-					r = 0
-				elif 'B' in tokens[1]:
-					r = 1
-				instruction1 = '1100000'+str(r)+'\n'
-				f.write(instruction1)
-				lineno+=1
-			elif 'COM' in tokens:
-				# Set bit representing the register
-				if 'A' in tokens[1]:
-					r = 0
-				elif 'B' in tokens[1]:
-					r = 1
-				instruction1 = '1101000'+str(r)+'\n'
-				f.write(instruction1)
-				lineno+=1
-			elif 'NEG' in tokens:
-				# Set bit representing the register
-				if 'A' in tokens[1]:
-					r = 0
-				elif 'B' in tokens[1]:
-					r = 1
-				instruction1 = '1110000'+str(r)+'\n'
-				f.write(instruction1)
-				lineno+=1
-			elif 'CLR' in tokens:
-				# Set bit representing the register
-				if 'A' in tokens[1]:
-					r = 0
-				elif 'B' in tokens[1]:
-					r = 1
-				instruction1 = '1111000'+str(r)+'\n'
-				f.write(instruction1)
-				lineno+=1
-			elif 'OUT' in tokens:
-				# Set bit representing the register
-				if 'A' in tokens[1]:
-					r = 0
-				elif 'B' in tokens[1]:
-					r = 1
-				if tokens[2].isdigit and tokens[2] == 0:
-					i = 0
-				elif tokens[2].isdigit and tokens[2] == 1:
-					i = 1
-				instruction1 = '000010'+str(i) + str(r)+'\n'
-				f.write(instruction1)
-				lineno+=1
-			elif 'IN' in tokens:
-				# Set bit representing the register
-				if 'A' in tokens[2]:
-					r = 0
-				elif 'B' in tokens[2]:
-					r = 1
-				if tokens[1].isdigit and tokens[1] == 0:
-					i = 0
-				elif tokens[1].isdigit and tokens[1] == 1:
-					i = 1
-				instruction1 = '000011'+str(i) + str(r)+'\n'
-				f.write(instruction1)
-				lineno+=1
-			elif 'BCDO' in tokens:
-				# Set bit representing the register
-				if 'A' in tokens[1]:
-					r = 0
-				elif 'B' in tokens[1]:
-					r = 1
-				instruction1 = '0100000' + str(r)+'\n'
-				f.write(instruction1)
-				lineno+=1
-			elif 'DEB' in tokens:
-				# Set bit representing the register
-				if tokens[1].isdigit():
-					i = str(tokens[1])
-				if 'A' in tokens[2]:
-					r = 0
-				elif 'B' in tokens[2]:
-					r = 1
-				instruction1 = '001000' + i + str(r)+'\n'
-				f.write(instruction1)
-				lineno+=1
-			elif 'BZ' in tokens:
-				# Set page bit
-				# Set bit representing the page and 
-				# rewrite memory address with respect to the page
-				if tokens[1].isdigit():
-					tokens[1] = int(tokens[1])
-				else :
-					print 'BZ ERROR:'
-					print 'Memory parameter: {} not an integer'.format(tokens[1])
-					sys.exit()
-				if tokens[1] <= 255:
-					p = 0
-				else:
-			 		p = 1
-			 	instruction1 = '0011000' + str(p)+'\n'
-			 	instruction2 = bin(tokens[2])[2:].zfill(8)[-8:]+'\n'
-			 	lineno+=2
-
-
-		if 'coe' in type:
-			f.write(';Instructions:\n')
-			for (number,line) in enumerate(lines):
-				f.write(';'+str(number)+': '+line+'\n')
-			f.write(';--- Memory Starts at line {}\n'.format(lineno))
-		for no in range(lineno,512):
-			# Start writing the user defined values to the proper
+	out_filename = out_filename + '.coe'
+	with open(out_filename, 'w') as f:
+		f.write('; Coefficient file for initializing a 512x8 RAM\n') 
+		f.write('; Filename: {}\n'.format(out_filename))
+		f.write(';\n')
+		f.write(';\n')
+		f.write(';Instructions:\n')
+		for instruction in lines:
+			f.write(';{}\n'.format(instruction))
+		f.write('memory_initialization_radix = 2;\n')
+		f.write('memory_initialization_vector =\n')
+		for mem_address in range(0,512):
+			# Start writing the memory values to the proper
 			# memory locations
-			if memory_vals.has_key(str(no)):
-				binary_rep = bin(int(memory_vals[str(no)]))[2:].zfill(8)
-				f.write(binary_rep+'\n')
+			if memory_vals.has_key(mem_address):
+				f.write(str(memory_vals[mem_address])+'\n')
+				#print'Address:{} Value:{}'.format(mem_address, memory_vals[mem_address])
 			else:
 				f.write('00000000\n')
 		f.write(';')
 
 
+def createDATfile(out_filename, memory_vals):
+	'''
+	Creates a dat file containing just the values of memory at 
+	their locations
+	'''
+	out_filename = out_filename + '.dat'
+	with open(out_filename, 'w') as f:
+		for mem_address in range(0,512):
+			# Start writing the memory values to the proper
+			# memory locations
+			if memory_vals.has_key(mem_address):
+				f.write(str(memory_vals[mem_address])+'\n')
+				#print'Address:{} Value:{}'.format(mem_address, memory_vals[mem_address])
+			else:
+				f.write('00000000\n')
+		f.write(';')
+
+
+def readfile(in_path, out_filename, type):
+	'''
+	Reads every line in the file and saves it to a list
+	'''
+	with open(in_path, 'rb') as filehandle:
+		lines = [line.rstrip() for line in filehandle]
+	memory_vals = getMemoryValues(lines, out_filename)
+
+	# strip any file indicators from out_filename
+	if '.' in out_filename:
+		out_filename = out_filename.replace(out_filename[out_filename.index('.'):],'')
+
+	if 'debug' in type:
+		# Some Things for debugging
+		sortedList = [x for x in memory_vals.iteritems()]
+		sortedList.sort(key=lambda x:x[0])
+		for item in sortedList:
+			print 'Address: {} :: Value: {}'.format(item[0],item[1])
+		sys.exit(0)
+	elif 'coe' in type:
+		# produce a coe type file
+		createCOEfile(out_filename, memory_vals, lines)
+	elif 'dat' in type:
+		# produce a dat file, which is just barebones and no comments
+		createDATfile(out_filename, memory_vals)
+	elif 'both' in type:
+		# produce both dat file and coe file
+		createCOEfile(out_filename, memory_vals, lines)
+		createDATfile(out_filename, memory_vals)
+
+
+
+
+def getMemoryValues(instructions, filename):
+	'''
+	Parses the lines in the Instruction file and stores the
+	contents of the memory address with the address in a 
+	dictionary. This dictionary is returned
+	'''
+	# Create empty dictionary
+	memorydict = {}
+	# Create variables for keeping track of memory blocks
+	offset = 0
+	increment = 1
+	lineNumber = 0
+
+	for line in instructions:
+		lineNumber+=1
+		line = line.upper()
+		tokens = re.split(',|:|;| ',line)
+
+		if tokens[0].isdigit():
+			# Store the initialized memory 
+			# value  and contents to be set after the op
+			# codes are finished
+			tokens[0] = int(tokens[0])
+			tokens[1] = int(tokens[0])
+			if tokens[0] <= 511 and tokens[1] <= 511:
+				memorydict[tokens[0]] = bin(tokens[1])[2:].zfill(8)
+
+		elif 'BEGIN' in tokens:
+			try:
+				offset = int(tokens[1])
+			except ValueError:
+				print 'Error at Line {}'.format(lineNumber)
+				print 'BEGIN location is not a number' 
+				sys.exit(1)
+			increment = 0
+
+		elif 'LOAD' in tokens:
+			# convert memory parameter to an integer
+			try:
+				tokens[1] = int(tokens[1])
+			except ValueError:
+				print 'Error at Line {}'.format(lineNumber)
+				print 'LOAD memory location is not a number' 
+				sys.exit(1)
+			if 'A' not in tokens[2] and 'B' not in tokens[2]:
+				print 'ERROR at Line {}'.format(lineNumber)
+				print 'Unknown Register {}'.format(tokens[2])
+				sys.exit(1)
+			else:
+				# Set bit representing the register
+				r = '0' if 'A' in tokens[2] else '1'
+				# Set bit representing the page and 
+				p = '0' if tokens[1]<=255 else '1'
+		 	# Put together instructions
+		 	instruction1 = '000000'+p+r
+		 	# The least significant bits of the desired address are stored
+		 	# in the second instruction. The cpu appends the page bit
+		 	# to the address when it is put on the address bus
+		 	instruction2 = bin(tokens[1])[2:].zfill(8)[-8:]
+		 	# Store in memorydict
+		 	memorydict[offset+0] = instruction1
+		 	memorydict[offset+1] = instruction2
+			increment = 2
+
+		elif 'STOR' in tokens:
+			try:
+				tokens[2] = int(tokens[2])
+			except ValueError:
+				print 'Error at Line {}'.format(lineNumber)
+				print 'STOR memory location is not a number' 
+				sys.exit(1)
+			if 'A' not in tokens[1] and 'B' not in tokens[1]:
+				print 'ERROR at Line {}'.format(lineNumber)
+				print 'Unknown Register {}'.format(tokens[1])
+				sys.exit(1)
+			else:
+				# Set bit representing the register
+				r = '0' if 'A' in tokens[1] else '1'
+				# Set bit representing the page and 
+				p = '0' if tokens[2]<=255 else '1'
+		 	# Put together instructions
+		 	instruction1 = '000000' + p + r
+		 	instruction2 = bin(tokens[2])[2:].zfill(8)[-8]
+			# Store in memorydict
+			memorydict[offset+0] = instruction1
+		 	memorydict[offset+1] = instruction2
+			increment = 2
+
+		elif 'ADD' in tokens:
+			# Set bit representing the register
+			if 'A' not in tokens[1] and 'B' not in tokens[1]:
+				print 'ERROR at Line {}'.format(lineNumber)
+				print 'Unknown Register {}'.format(tokens[1])
+				sys.exit(1)
+			else:
+				# Set bit representing the register
+				r = '0' if 'A' in tokens[1] else '1'
+			instruction1 = '1000000' + r
+			memorydict[offset+0] = instruction1
+			increment = 1
+		elif 'SUB' in tokens:
+			# Set bit representing the register
+			if 'A' not in tokens[1] and 'B' not in tokens[1]:
+				print 'ERROR at Line {}'.format(lineNumber)
+				print 'Unknown Register {}'.format(tokens[1])
+				sys.exit(1)
+			else:
+				# Set bit representing the register
+				r = '0' if 'A' in tokens[1] else '1'
+			instruction1 = '1001000' + r
+			memorydict[offset+0] = instruction1
+			increment = 1
+		elif 'LSL' in tokens:
+			# Set bit representing the register
+			if 'A' not in tokens[1] and 'B' not in tokens[1]:
+				print 'ERROR at Line {}'.format(lineNumber)
+				print 'Unknown Register {}'.format(tokens[1])
+				sys.exit(1)
+			else:
+				# Set bit representing the register
+				r = '0' if 'A' in tokens[1] else '1'
+			instruction1 = '1010000' + r
+			memorydict[offset+0] = instruction1
+			increment = 1
+		elif 'LSR' in tokens:
+			# Set bit representing the register
+			if 'A' not in tokens[1] and 'B' not in tokens[1]:
+				print 'ERROR at Line {}'.format(lineNumber)
+				print 'Unknown Register {}'.format(tokens[1])
+				sys.exit(1)
+			else:
+				# Set bit representing the register
+				r = '0' if 'A' in tokens[1] else '1'
+			instruction1 = '1011000' + r
+			memorydict[offset+0] = instruction1
+			increment = 1
+		elif 'XOR' in tokens:
+			# Set bit representing the register
+			if 'A' not in tokens[1] and 'B' not in tokens[1]:
+				print 'ERROR at Line {}'.format(lineNumber)
+				print 'Unknown Register {}'.format(tokens[1])
+				sys.exit(1)
+			else:
+				# Set bit representing the register
+				r = '0' if 'A' in tokens[1] else '1'
+			instruction1 = '1100000' + r
+			memorydict[offset+0] = instruction1
+			increment = 1
+		elif 'COM' in tokens:
+			# Set bit representing the register
+			if 'A' not in tokens[1] and 'B' not in tokens[1]:
+				print 'ERROR at Line {}'.format(lineNumber)
+				print 'Unknown Register {}'.format(tokens[1])
+				sys.exit(1)
+			else:
+				# Set bit representing the register
+				r = '0' if 'A' in tokens[1] else '1'
+			instruction1 = '1101000' + r
+			memorydict[offset+0] = instruction1
+			increment = 1
+		elif 'NEG' in tokens:
+			# Set bit representing the register
+			if 'A' not in tokens[1] and 'B' not in tokens[1]:
+				print 'ERROR at Line {}'.format(lineNumber)
+				print 'Unknown Register {}'.format(tokens[1])
+				sys.exit(1)
+			else:
+				# Set bit representing the register
+				r = '0' if 'A' in tokens[1] else '1'
+			instruction1 = '1110000' + r
+			memorydict[offset+0] = instruction1
+			increment = 1
+		elif 'CLR' in tokens:
+			if 'A' not in tokens[1] and 'B' not in tokens[1]:
+				print 'ERROR at Line {}'.format(lineNumber)
+				print 'Unknown Register {}'.format(tokens[1])
+				sys.exit(1)
+			else:
+				# Set bit representing the register
+				r = '0' if 'A' in tokens[1] else '1'
+			instruction1 = '1111000' + r
+			memorydict[offset+0] = instruction1
+			increment = 1
+		elif 'OUT' in tokens:
+			try:
+				tokens[2] = int(tokens[2])
+			except ValueError:
+				print 'Error at Line {}'.format(lineNumber)
+				print 'OUT source is not a number' 
+				sys.exit(1)
+			if 'A' not in tokens[1] and 'B' not in tokens[1]:
+				print 'ERROR at Line {}'.format(lineNumber)
+				print 'Unknown Register {}'.format(tokens[1])
+				sys.exit(1)
+			else:
+				# Set bit representing the register
+				r = '0' if 'A' in tokens[1] else '1'
+				# Set bit representing the i bit
+				i = '0' if tokens[2]==0 else '1'
+
+			instruction1 = '000010' + i + r
+			memorydict[offset+0] = instruction1
+			increment = 1
+		elif 'IN' in tokens:
+			try:
+				tokens[1] = int(tokens[1])
+			except ValueError:
+				print 'Error at Line {}'.format(lineNumber)
+				print 'IN source is not a number' 
+				sys.exit(1)
+			if 'A' not in tokens[2] and 'B' not in tokens[2]:
+				print 'ERROR at Line {}'.format(lineNumber)
+				print 'Unknown Register {}'.format(tokens[2])
+				sys.exit(1)
+			else:
+				# Set bit representing the register
+				r = '0' if 'A' in tokens[2] else '1'
+				# Set bit representing the i bit
+				i = '0' if tokens[1]==0 else '1'
+			instruction1 = '000011' + i + r
+			memorydict[offset+0] = instruction1
+			increment = 1
+		elif 'BCDO' in tokens:
+			if 'A' not in tokens[1] and 'B' not in tokens[1]:
+				print 'ERROR at Line {}'.format(lineNumber)
+				print 'Unknown Register {}'.format(tokens[1])
+				sys.exit(1)
+			else :
+				# Set bit representing the register
+				r = '0' if 'A' in tokens[1] else '1'
+			instruction1 = '0100000' + r
+			memorydict[offset+0] = instruction1
+			increment = 1
+		elif 'DEB' in tokens:
+			try:
+				tokens[1] = int(tokens[1])
+			except ValueError:
+				print 'Error at Line {}'.format(lineNumber)
+				print 'IN source is not a number' 
+				sys.exit(1)
+			if 'A' not in tokens[2] and 'B' not in tokens[2]:
+				print 'ERROR at Line {}'.format(lineNumber)
+				print 'Unknown Register {}'.format(tokens[2])
+				sys.exit(1)
+			else:
+				# Set bit representing the register
+				r = '0' if 'A' in tokens[2] else '1'
+				# Set bit representing the i bit
+				i = '0' if tokens[1]==0 else '1'
+			instruction1 = '001000' + i + r
+			memorydict[offset+0] = instruction1
+			increment = 1
+		elif 'BZ' in tokens:
+			# Set page bit
+			try:
+				tokens[1] = int(tokens[1])
+				tokens[2] = int(tokens[2])
+				p = '0' if tokens[1]<=255 else '1'
+			except ValueError:
+				print 'Error at Line {}'.format(lineNumber)
+				print 'BZ argument is not a number' 
+				sys.exit(1)
+
+		 	instruction1 = '001100' + p +'0'
+		 	instruction2 = bin(tokens[2])[2:].zfill(8)[-8:]
+		 	memorydict[offset+0] = instruction1
+		 	memorydict[offset+1] = instruction2
+		 	increment = 1
+
+		# Keep track of number of elements away from the 'BEGIN' Directive
+		offset += increment
+	return memorydict
+
+
 def main(argv):
 	# Default file names options
-	inFILE = 'Instructions.dat'
+	inFILE = 'Instructions_rev2.dat'
 	outFILE= 'Encoding.coe'
-	type = 'coe'
+	type = 'both'
 	try:
 		opts, args = getopt.getopt(argv, 'i:o:ht:',['inFILE','outFILE','help','type'])
 
@@ -302,10 +401,12 @@ def main(argv):
 		elif opt in ('-h','--help'):
 			print 'Simple Assembler Help:'
 			print '-t or --type defines the type of output file'
-			print 'choices are .coe or .dat'
+			print '        choices are coe or dat debug or both(default)'
 			print ''
 			print '-o or --outFILE defines the name of the output file'
+			print '        default is Encoding.coe and Encoding.dat'
 			print '-i or --inFILE defines the name of the input file'
+			print '		   default is Instructions.dat'
 
 	
 
