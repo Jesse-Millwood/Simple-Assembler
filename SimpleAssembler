@@ -26,6 +26,7 @@ Python Version: 2.7
 # IN P,R 		-> 000011ir
 # BCDO R        -> 0100000r
 # DEB i,R       -> 001000ir
+# BZ M          -> 0011000p, mmmmmmmm
 
 
 
@@ -92,15 +93,16 @@ def parse(lines, out_path, type):
 				elif 'B' in tokens[2]:
 					r = 1
 				# Set bit representing the page and 
-				# rewrite memory address with respect to the page
 				if tokens[1] <= 255:
 					p = 0
 				else:
 			 		p = 1
-			 		tokens[1] = tokens[1]-255
 			 	# Put together instructions
 			 	instruction1 = '000000'+str(p)+str(r)+'\n'
-			 	instruction2 = bin(tokens[1])[2:].zfill(8)+'\n'
+			 	# The least significant bits of the desired address are stored
+			 	# in the second instruction. The cpu appends the page bit
+			 	# to the address when it is put on the address bus
+			 	instruction2 = bin(tokens[1])[2:].zfill(8)[-8:]+'\n'
 			 	# Write to file
 				f.write(instruction1)
 				f.write(instruction2)
@@ -118,10 +120,9 @@ def parse(lines, out_path, type):
 					p = 0
 				else:
 			 		p = 1
-			 		tokens[2] = tokens[2] - 255
 			 	# Put together instructions
 			 	instruction1 = '000000'+str(p)+str(r)+'\n'
-			 	instruction2 = bin(tokens[2])[2:].zfill(8)+'\n'
+			 	instruction2 = bin(tokens[2])[2:].zfill(8)[-8]+'\n'
 			 	# Write to file
 				f.write(instruction1)
 				f.write(instruction2)
@@ -244,6 +245,25 @@ def parse(lines, out_path, type):
 				instruction1 = '001000' + i + str(r)+'\n'
 				f.write(instruction1)
 				lineno+=1
+			elif 'BZ' in tokens:
+				# Set page bit
+				# Set bit representing the page and 
+				# rewrite memory address with respect to the page
+				if tokens[1].isdigit():
+					tokens[1] = int(tokens[1])
+				else :
+					print 'BZ ERROR:'
+					print 'Memory parameter: {} not an integer'.format(tokens[1])
+					sys.exit()
+				if tokens[1] <= 255:
+					p = 0
+				else:
+			 		p = 1
+			 	instruction1 = '0011000' + str(p)+'\n'
+			 	instruction2 = bin(tokens[2])[2:].zfill(8)[-8:]+'\n'
+			 	lineno+=2
+
+
 		if 'coe' in type:
 			f.write(';Instructions:\n')
 			for (number,line) in enumerate(lines):
