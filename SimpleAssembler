@@ -128,11 +128,11 @@ def getMemoryValues(instructions, filename):
 			# value  and contents to be set after the op
 			# codes are finished
 			tokens[0] = int(tokens[0])
-			tokens[1] = int(tokens[0])
+			tokens[1] = int(tokens[1])
 			if tokens[0] <= 511 and tokens[1] <= 511:
 				memorydict[tokens[0]] = bin(tokens[1])[2:].zfill(8)
 
-		elif 'BEGIN ' in tokens:
+		elif 'BEGIN' in tokens:
 			try:
 				offset = int(tokens[1])
 			except ValueError:
@@ -141,7 +141,7 @@ def getMemoryValues(instructions, filename):
 				sys.exit(1)
 			increment = 0
 
-		elif 'LOAD ' in tokens:
+		elif 'LOAD' in tokens:
 			# convert memory parameter to an integer
 			try:
 				tokens[1] = int(tokens[1])
@@ -169,7 +169,7 @@ def getMemoryValues(instructions, filename):
 		 	memorydict[offset+1] = instruction2
 			increment = 2
 
-		elif 'STOR ' in tokens:
+		elif 'STOR' in tokens:
 			try:
 				tokens[2] = int(tokens[2])
 			except ValueError:
@@ -193,7 +193,7 @@ def getMemoryValues(instructions, filename):
 		 	memorydict[offset+1] = instruction2
 			increment = 2
 
-		elif 'ADD ' in tokens:
+		elif 'ADD' in tokens:
 			# Set bit representing the register
 			if 'A' not in tokens[1] and 'B' not in tokens[1]:
 				print 'ERROR at Line {}'.format(lineNumber)
@@ -205,7 +205,7 @@ def getMemoryValues(instructions, filename):
 			instruction1 = '1000000' + r
 			memorydict[offset+0] = instruction1
 			increment = 1
-		elif 'SUB ' in tokens:
+		elif 'SUB' in tokens:
 			# Set bit representing the register
 			if 'A' not in tokens[1] and 'B' not in tokens[1]:
 				print 'ERROR at Line {}'.format(lineNumber)
@@ -217,7 +217,7 @@ def getMemoryValues(instructions, filename):
 			instruction1 = '1001000' + r
 			memorydict[offset+0] = instruction1
 			increment = 1
-		elif 'LSL ' in tokens:
+		elif 'LSL' in tokens:
 			# Set bit representing the register
 			if 'A' not in tokens[1] and 'B' not in tokens[1]:
 				print 'ERROR at Line {}'.format(lineNumber)
@@ -229,7 +229,7 @@ def getMemoryValues(instructions, filename):
 			instruction1 = '1010000' + r
 			memorydict[offset+0] = instruction1
 			increment = 1
-		elif 'LSR ' in tokens:
+		elif 'LSR' in tokens:
 			# Set bit representing the register
 			if 'A' not in tokens[1] and 'B' not in tokens[1]:
 				print 'ERROR at Line {}'.format(lineNumber)
@@ -241,7 +241,7 @@ def getMemoryValues(instructions, filename):
 			instruction1 = '1011000' + r
 			memorydict[offset+0] = instruction1
 			increment = 1
-		elif 'XOR ' in tokens:
+		elif 'XOR' in tokens:
 			# Set bit representing the register
 			if 'A' not in tokens[1] and 'B' not in tokens[1]:
 				print 'ERROR at Line {}'.format(lineNumber)
@@ -253,7 +253,7 @@ def getMemoryValues(instructions, filename):
 			instruction1 = '1100000' + r
 			memorydict[offset+0] = instruction1
 			increment = 1
-		elif 'COM ' in tokens:
+		elif 'COM' in tokens:
 			# Set bit representing the register
 			if 'A' not in tokens[1] and 'B' not in tokens[1]:
 				print 'ERROR at Line {}'.format(lineNumber)
@@ -277,7 +277,7 @@ def getMemoryValues(instructions, filename):
 			instruction1 = '1110000' + r
 			memorydict[offset+0] = instruction1
 			increment = 1
-		elif 'CLR ' in tokens:
+		elif 'CLR' in tokens:
 			if 'A' not in tokens[1] and 'B' not in tokens[1]:
 				print 'ERROR at Line {}'.format(lineNumber)
 				print 'Unknown Register {}'.format(tokens[1])
@@ -288,7 +288,7 @@ def getMemoryValues(instructions, filename):
 			instruction1 = '1111000' + r
 			memorydict[offset+0] = instruction1
 			increment = 1
-		elif 'OUT ' in tokens:
+		elif 'OUT' in tokens:
 			try:
 				tokens[2] = int(tokens[2])
 			except ValueError:
@@ -308,7 +308,7 @@ def getMemoryValues(instructions, filename):
 			instruction1 = '000010' + i + r
 			memorydict[offset+0] = instruction1
 			increment = 1
-		elif 'IN ' in tokens:
+		elif 'IN' in tokens and 'BEGIN' not in tokens:
 			try:
 				tokens[1] = int(tokens[1])
 			except ValueError:
