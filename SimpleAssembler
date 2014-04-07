@@ -327,7 +327,7 @@ def getMemoryValues(instructions, filename):
 			instruction1 = '000011' + i + r
 			memorydict[offset+0] = instruction1
 			increment = 1
-		elif 'BCDO ' in tokens:
+		elif 'BCDO' in tokens:
 			if 'A' not in tokens[1] and 'B' not in tokens[1]:
 				print 'ERROR at Line {}'.format(lineNumber)
 				print 'Unknown Register {}'.format(tokens[1])
@@ -338,7 +338,7 @@ def getMemoryValues(instructions, filename):
 			instruction1 = '0100000' + r
 			memorydict[offset+0] = instruction1
 			increment = 1
-		elif 'DEB ' in tokens:
+		elif 'DEB' in tokens:
 			try:
 				tokens[1] = int(tokens[1])
 			except ValueError:
@@ -357,7 +357,7 @@ def getMemoryValues(instructions, filename):
 			instruction1 = '001000' + i + r
 			memorydict[offset+0] = instruction1
 			increment = 1
-		elif 'BZ ' in tokens:
+		elif 'BZ' in tokens:
 			# Set page bit
 			try:
 				tokens[1] = int(tokens[1])
@@ -368,7 +368,7 @@ def getMemoryValues(instructions, filename):
 				sys.exit(1)
 
 		 	instruction1 = '001100' + p +'0'
-		 	instruction2 = bin(tokens[1])[1:].zfill(8)[-8:]
+		 	instruction2 = bin(tokens[1])[2:].zfill(8)[-8:]
 		 	memorydict[offset+0] = instruction1
 		 	memorydict[offset+1] = instruction2
 		 	increment = 2
