@@ -187,7 +187,7 @@ def getMemoryValues(instructions, filename):
 				p = '0' if tokens[2]<=255 else '1'
 		 	# Put together instructions
 		 	instruction1 = '000001' + p + r
-		 	instruction2 = bin(tokens[2])[2:].zfill(8)[-8]
+		 	instruction2 = bin(tokens[2])[2:].zfill(8)[-8:]
 			# Store in memorydict
 			memorydict[offset+0] = instruction1
 		 	memorydict[offset+1] = instruction2
