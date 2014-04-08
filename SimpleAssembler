@@ -343,7 +343,7 @@ def getMemoryValues(instructions, filename):
 				tokens[1] = int(tokens[1])
 			except ValueError:
 				print 'Error at Line {}'.format(lineNumber)
-				print 'IN source is not a number' 
+				print 'DEB source is not a number' 
 				sys.exit(1)
 			if 'A' not in tokens[2] and 'B' not in tokens[2]:
 				print 'ERROR at Line {}'.format(lineNumber)
