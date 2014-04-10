@@ -289,12 +289,6 @@ def getMemoryValues(instructions, filename):
 			memorydict[offset+0] = instruction1
 			increment = 1
 		elif 'OUT' in tokens:
-			try:
-				tokens[2] = int(tokens[2])
-			except ValueError:
-				print 'Error at Line {}'.format(lineNumber)
-				print 'OUT source is not a number' 
-				sys.exit(1)
 			if 'A' not in tokens[1] and 'B' not in tokens[1]:
 				print 'ERROR at Line {}'.format(lineNumber)
 				print 'Unknown Register {}'.format(tokens[1])
@@ -303,7 +297,7 @@ def getMemoryValues(instructions, filename):
 				# Set bit representing the register
 				r = '0' if 'A' in tokens[1] else '1'
 				# Set bit representing the i bit
-				i = '0' if tokens[2]==0 else '1'
+				i = '0' if tokens[1]==0 else '1'
 
 			instruction1 = '000010' + i + r
 			memorydict[offset+0] = instruction1
