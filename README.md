@@ -27,6 +27,9 @@ The following are the instructions implemented so far
 |IN P,R 	 |000011ir           | 
 |BCDO R      |0100000r           | 
 |DEB i,R     |001000ir 			 |
+|BZ M 		 |001100p0, mmmmmmmm |
+|LDX K 		 |000111p0, kkkkkkkk |
+|JMPX R 	 |0101000r           |  
 
 
 In the input file, memory locations can be initialized by typing the memory address and desired contents of the that memory address separated by a colon.  

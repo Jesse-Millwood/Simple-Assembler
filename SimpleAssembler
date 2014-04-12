@@ -27,6 +27,8 @@ Python Version: 2.7
 # BCDO R        -> 0100000r
 # DEB i,R       -> 001000ir
 # BZ M          -> 001100p0, mmmmmmmm
+# LDX K 		-> 000111p0, kkkkkkkk
+# JMPX R        -> 0101000r
 
 def createCOEfile(out_filename, memory_vals, lines):
 	'''
@@ -367,6 +369,35 @@ def getMemoryValues(instructions, filename):
 		 	memorydict[offset+1] = instruction2
 		 	increment = 2
 
+		elif 'LDX' in tokens:
+			# Set page bit
+			try:
+				tokens[1] = int(tokens[1])
+				p = '0' if tokens[1]<=255 else '1'
+			except ValueError:
+				print 'Error at Line {}'.format(lineNumber)
+				print 'LDX argument is not a number' 
+				sys.exit(1)
+
+			instruction1 = '000111' + p + '0'
+			instruction2 = bin(tokens[1])[2:].zfill(8)[-8:]
+			memorydict[offset+0] = instruction1
+			memorydict[offset+1] = instruction2
+			increment = 2
+
+		elif 'JMPX' in tokens:
+			if 'A' not in tokens[1] and 'B' not in tokens[1]:
+				print 'ERROR in JMPX at Line {}'.format(lineNumber)
+				print 'Unknown Register {}'.format(tokens[1])
+				sys.exit(1)
+			else:
+				# Set bit representing the register
+				r = '0' if 'A' in tokens[1] else '1'
+			instruction1 = '0101000' + r
+			memorydict[offset+0] = instruction1
+			increment = 1
+
+
 		# Keep track of number of elements away from the 'BEGIN' Directive
 		offset += increment
 	return memorydict
@@ -434,6 +465,8 @@ def main(argv):
 			print ' BCDO R 		-> 0100000r'
 			print ' DEB i,R 		-> 001000ir'
 			print ' BZ M 			-> 001100p0, mmmmmmmm'
+			print ' LDX K 		-> 000111p0, kkkkkkkk'
+			print ' JMPX R 		-> 0101000r'
 			print ''
 			print ' Author: Jesse Millwood'
 			print ' April 2014'
